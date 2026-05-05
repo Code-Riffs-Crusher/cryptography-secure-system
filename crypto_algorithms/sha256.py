@@ -7,9 +7,6 @@ def text_to_bytes(message):
 
     for char in message:
         value = ord(char)
-
-        # This project version supports normal ASCII characters.
-        # Most test inputs like hello, abc, names, and numbers are ASCII.
         byte_list.append(value)
 
     return byte_list
@@ -45,10 +42,8 @@ def int_to_hex_8_digits(number):
 
 
 def sha256(message):
-    # Convert string into list of byte values
     message_bytes = text_to_bytes(message)
 
-    # SHA-256 initial hash values
     h0 = 0x6a09e667
     h1 = 0xbb67ae85
     h2 = 0x3c6ef372
@@ -58,7 +53,6 @@ def sha256(message):
     h6 = 0x1f83d9ab
     h7 = 0x5be0cd19
 
-    # SHA-256 round constants
     K = [
         0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
         0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -80,26 +74,21 @@ def sha256(message):
 
     original_bit_length = len(message_bytes) * 8
 
-    # Add the 1 bit as 10000000 in binary
     message_bytes.append(0x80)
 
-    # Add zero bytes until message length is 448 mod 512 bits
     while (len(message_bytes) * 8) % 512 != 448:
         message_bytes.append(0)
 
-    # Add original length as 64-bit big-endian number
     length_bytes = int_to_8_bytes(original_bit_length)
 
     for byte in length_bytes:
         message_bytes.append(byte)
 
-    # Process each 512-bit block, which is 64 bytes
     for block_start in range(0, len(message_bytes), 64):
         block = message_bytes[block_start:block_start + 64]
 
         words = []
 
-        # Break block into sixteen 32-bit words
         for i in range(0, 64, 4):
             word = four_bytes_to_int(
                 block[i],
@@ -109,7 +98,6 @@ def sha256(message):
             )
             words.append(word)
 
-        # Extend sixteen words into sixty-four words
         for i in range(16, 64):
             s0 = (
                 right_rotate(words[i - 15], 7)
@@ -132,7 +120,6 @@ def sha256(message):
 
             words.append(new_word)
 
-        # Initialize working variables
         a = h0
         b = h1
         c = h2
@@ -142,7 +129,6 @@ def sha256(message):
         g = h6
         h = h7
 
-        # Main SHA-256 compression loop
         for i in range(64):
             S1 = (
                 right_rotate(e, 6)
@@ -179,7 +165,6 @@ def sha256(message):
             b = a
             a = (temp1 + temp2) & 0xFFFFFFFF
 
-        # Add compressed result back into hash values
         h0 = (h0 + a) & 0xFFFFFFFF
         h1 = (h1 + b) & 0xFFFFFFFF
         h2 = (h2 + c) & 0xFFFFFFFF
@@ -189,7 +174,6 @@ def sha256(message):
         h6 = (h6 + g) & 0xFFFFFFFF
         h7 = (h7 + h) & 0xFFFFFFFF
 
-    # Convert final hash values to hexadecimal manually
     final_hash = (
         int_to_hex_8_digits(h0)
         + int_to_hex_8_digits(h1)
