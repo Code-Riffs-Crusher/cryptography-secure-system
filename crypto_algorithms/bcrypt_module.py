@@ -1,6 +1,5 @@
 import bcrypt
 
-
 def hash_password(password):
 
     if not isinstance(password, str):
