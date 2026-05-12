@@ -80,7 +80,7 @@ def encrypt(message, p, g, public_key):
 
         shared_secret = pow(public_key, k, p)
 
-        c2 = (message_value * shared_secret) % 128
+        c2 = (message_value * shared_secret) % p
 
         encrypted_message.append((c1, c2))
 

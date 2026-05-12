@@ -34,11 +34,11 @@ def run_elgamal_demo():
 
     p, g = 467, 2
 
-    private_key, public_key = elgamal.generate_keys(p, g)
+    public_key, private_key = elgamal.generate_keys(p, g)
 
     message = "hi"
 
-    encrypted = elgamal.encrypt(message, public_key, p, g)
+    encrypted = elgamal.encrypt(message, p, g, public_key)
     decrypted = elgamal.decrypt(encrypted, private_key, p)
 
     print("Original:", message)
