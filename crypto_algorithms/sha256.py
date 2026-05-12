@@ -4,9 +4,9 @@ def right_rotate(value, bits):
 
 def text_to_bytes(message):
     if isinstance(message, bytes):
-        return list(message)              
-    return [ord(char) for char in message]
+        return list(message)
 
+    return list(str(message).encode("utf-8"))
 
 def int_to_8_bytes(number):
     result = []
