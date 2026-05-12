@@ -4,24 +4,15 @@ from crypto_algorithms.sha256 import sha256
 import os
 
 
-def generate_salt(length=16):
-    """
-    Generates a random salt.
 
-    os.urandom is used only to create random bytes.
-    It is not a hashing library and it is not bcrypt.
-    """
+def generate_salt(length=16):
+
     random_bytes = os.urandom(length)
     return random_bytes.hex()
 
 
 def constant_time_compare(value1, value2):
-    """
-    Compares two strings safely.
 
-    This avoids returning immediately when one character is different.
-    That is better for password verification.
-    """
     if len(value1) != len(value2):
         return False
 
@@ -34,17 +25,7 @@ def constant_time_compare(value1, value2):
 
 
 def bcrypt_like_hash(password, cost=12, salt=None):
-    """
-    Educational bcrypt-like password hashing function.
 
-    This is NOT real bcrypt.
-    It demonstrates bcrypt concepts:
-    - UTF-8 password encoding
-    - random salt
-    - cost factor
-    - repeated hashing
-    - stored hash format
-    """
 
     if not isinstance(password, str):
         raise TypeError("Password must be a string.")
@@ -55,42 +36,29 @@ def bcrypt_like_hash(password, cost=12, salt=None):
     if salt is None:
         salt = generate_salt()
 
-    # Convert password and salt to bytes.
-    # Your sha256 function supports bytes because of text_to_bytes().
     password_bytes = password.encode("utf-8")
     salt_bytes = salt.encode("utf-8")
 
-    # First mix: password + salt
     data = password_bytes + salt_bytes
 
-    # The cost controls how many times hashing happens.
-    # Example: cost = 12 means 2^12 = 4096 rounds.
     rounds = 2 ** cost
 
     hashed_value = sha256(data)
 
     for _ in range(rounds - 1):
-        # sha256 returns a hex string, so we encode it again before hashing.
         data = hashed_value.encode("utf-8") + password_bytes + salt_bytes
         hashed_value = sha256(data)
 
-    # Store all needed information in one string.
-    # This allows verification later.
     return f"$custombcrypt$v1${cost}${salt}${hashed_value}"
 
 
 def bcrypt_like_verify(password, stored_hash):
-    """
-    Verifies a password against a stored bcrypt-like hash.
-    """
 
     if not isinstance(password, str):
         raise TypeError("Password must be a string.")
 
     parts = stored_hash.split("$")
 
-    # Expected format:
-    # $custombcrypt$v1$cost$salt$hash
     if len(parts) != 6:
         return False
 
@@ -117,12 +85,10 @@ def bcrypt_like_verify(password, stored_hash):
     return constant_time_compare(original_hash, new_hash_value)
 
 
-# Optional aliases with shorter names
 bcrypt_hash = bcrypt_like_hash
 bcrypt_verify = bcrypt_like_verify
 
 
-# Optional testing from terminal
 if __name__ == "__main__":
     password = input("Enter password: ")
 
